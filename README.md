@@ -21,14 +21,14 @@ git clone git@github.com:are-you-ready/server.git ayr-server
 - Install all dependencies with npm
 
 ```bash
-cd ayr-server
-npm install
+cd ayr-server   # Move to the /ayr-server directory you created
+npm install     # Install dependencies listed in package.json to /node_modules
 ```
 
 - Run the server locally (on port 3000)
 
 ```bash
-npm start
+npm start       # "Server started on port 3000."
 ```
 
 - Test the server by visiting http://localhost:3000
