@@ -8,5 +8,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(AYR_PORT, () => {
-  console.log(`Server started on port ${AYR_PORT}.`);
+  console.log(`Server started on port ${AYR_PORT}.`); // eslint-disable-line no-console
 });
