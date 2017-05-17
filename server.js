@@ -10,6 +10,13 @@ app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
 
+app.get('/profile/:name', (req, res) => {
+  res.json({
+    name: req.params.name,
+    age: 62
+  });
+});
+
 app.listen(AYR_PORT, () => {
   console.log(`Server started on port ${AYR_PORT}.`); // eslint-disable-line no-console
 });
