@@ -1,0 +1,22 @@
+{
+  "name": "ayr-server",
+  "version": "0.0.0",
+  "description": "Are You Ready - Web Server",
+  "author": {
+    "name": "Markus Tran",
+    "email": "thebluepillow@gmail.com",
+    "url": "http://pillowfication.com"
+  },
+  "homepage": "https://github.com/are-you-ready/server",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/are-you-ready/server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/are-you-ready/server/issues"
+  },
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
