@@ -20,7 +20,7 @@ module.exports = {
   },
 
   getGroup(name) {
-    return AYRGroup.findOne({name})
+    return AYRGroup.findOne({name}).populate('users')
       .then(assertExistence(`No AYRGroup found with ${util.inspect({name})}`));
   },
 
@@ -34,12 +34,18 @@ module.exports = {
       .then(assertExistence(`No AYRUser found with ${util.inspect({name})}`));
   },
 
+  getGroupsContainingUser(name) {
+    return AYRUser.findOne({name})
+      .then(assertExistence(`No AYRUser found with ${util.inspect({name})}`))
+      .then(user => AYRGroup.find({users: user._id}).populate('users'));
+  },
+
   addUserToGroup(groupName, userName) {
     return AYRUser.findOne({name: userName})
       .then(assertExistence(`No AYRUser found with ${util.inspect({name: userName})}`))
       .then(user => AYRGroup.findOneAndUpdate(
         {name: groupName},
-        {$addToSet: {users: [user._id]}},
+        {$addToSet: {users: user._id}},
         {returnNewDocument: true}
       ))
       .then(assertExistence(`No AYRGroup found with ${util.inspect({name: groupName})}`));
