@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
 
-app.get('/user/:name', (req, res) => {
+app.get('/api/user/:name', (req, res) => {
   const {name} = req.params;
 
   db.getUser(name)
@@ -38,7 +38,7 @@ app.get('/user/:name', (req, res) => {
     });
 });
 
-app.get('/group/:name', (req, res) => {
+app.get('/api/group/:name', (req, res) => {
   const {name} = req.params;
 
   db.getGroup(name)
