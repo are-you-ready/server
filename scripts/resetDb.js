@@ -5,8 +5,9 @@ const db = require('../db');
 const INIT_STRUCTURE = {
   users: ['Markus', 'Shannon', 'Ryan', 'Scott', 'TestUser'],
   groups: {
-    cis55: ['Markus', 'Shannon', 'Ryan', 'Scott'],
-    testGroup: ['Markus', 'TestUser']
+    cis55: ['Markus', 'Shannon', 'Ryan', 'Scott']
+    // For now, assume everyone has exactly 1 group
+    // testGroup: ['Markus', 'TestUser']
   }
 };
 const {users, groups} = INIT_STRUCTURE;
