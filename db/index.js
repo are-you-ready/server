@@ -60,6 +60,44 @@ module.exports = {
         {returnNewDocument: true}
       ))
       .then(assertExistence(`No AYRGroup found with ${util.inspect({name: groupName})}`));
+  },
+
+  getEventInGroup(groupName, eventName) {
+    return AYREvent.findOne({name: eventName}).populate('attendees.user')
+      .then(assertExistence(`No AYRGroup found with ${util.inspect({name: eventName})}`));
+  },
+
+  createEventInGroup(groupName, creator, name, desc, notificationTime, readyTime) {
+    return AYRUser.findOne({name: creator})
+      .then(assertExistence(`No AYRUser found with ${util.inspect({name: creator})}`))
+      .then(user =>
+        AYRGroup.findOne({name: groupName})
+          .then(assertExistence(`No AYRGroup found with ${util.inspect({name: groupName})}`))
+          .then(group => ({user, group}))
+      )
+      .then(({user, group}) => {
+        const event = new AYREvent({
+          name: name,
+          description: desc,
+          createdBy: user._id,
+          createdAt: Date.now(),
+          notificationTime: notificationTime,
+          readyTime: readyTime,
+          attendees: group.users.map(user => {
+            return {
+              user: user,
+              status: 'pending'
+            };
+          })
+        });
+        return event.save();
+      })
+      .then(event => AYRGroup.findOneAndUpdate(
+        {name: groupName},
+        {$addToSet: {events: event._id}},
+        {returnNewDocument: true}
+      ))
+      .then(assertExistence(`No AYRGroup found with ${util.inspect({name: groupName})}`));
   }
 };
 
