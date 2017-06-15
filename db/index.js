@@ -1,17 +1,29 @@
 const util = require('util');
 const mongoose = require('mongoose');
-const {AYRUser, AYREvent, AYRGroup} = require('./models');
+const {AYRGroup} = require('./models');
 
 mongoose.Promise = Promise;
 mongoose.connect('localhost', 'are-you-ready');
 
-function assertExistence(msg) {
-  return function _assertExistence(value) {
-    return new Promise((resolve, reject) => {
-      value == null ? reject(new Error(msg)) : resolve(value);
-    });
-  };
-}
+// function assertExistence(msg) {
+//   return function _assertExistence(value) {
+//     return new Promise((resolve, reject) => {
+//       value == null ? reject(new Error(msg)) : resolve(value);
+//     });
+//   };
+// }
+
+module.exports = {
+  createGroup(name) {
+    const group = new AYRGroup({name});
+    return group.save();
+  },
+
+  readGroup(name) {
+    return AYRGroup.findOne({name})
+      .then()
+  }
+};
 
 module.exports = {
   createGroup(name) {

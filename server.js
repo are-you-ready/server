@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 const db = require('./db');
 const app = express();
 
@@ -9,6 +10,7 @@ const AYR_PORT = process.argv[2] || process.env.AYR_PORT || 3000;
 app.set('json spaces', 2);
 
 app.use(morgan('dev'));
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');
@@ -53,6 +55,10 @@ app.get('/api/group/:name', (req, res) => {
     .catch(err => {
       res.json({error: err.message});
     });
+});
+
+app.post('/api/createEvent', (req, res) => {
+  console.log(req.body);
 });
 
 app.listen(AYR_PORT, () => {
