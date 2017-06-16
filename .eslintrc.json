@@ -6,5 +6,9 @@
     "es6": true,
     "node": true
   },
-  "extends": "pf"
+  "extends": "eslint:recommended",
+  "rules": {
+    "semi": "error",
+    "quotes": ["error", "single", { "avoidEscape": true }]
+  }
 }

@@ -4,21 +4,22 @@ const Schema = mongoose.Schema;
 const AYRGroupSchema = new Schema({
   name:               {type: String, required: true, unique: true},
   users: [{
-    name:             {type: String, required: true, unique: true},
+    name:             {type: String, required: true},
     active:           {type: Boolean, required: true, default: true}
   }],
   events: [{
-    name:             {type: String, required: true, unique: true},
-    description:      {type: String},
-    location:         {type: String},
-    meetupLocation:   {type: String},
+    name:             {type: String, required: true},
+    type:             {type: String, required: true},
+    description:      {type: String, required: true},
+    location:         {type: String, required: true},
+    meetupLocation:   {type: String, required: true},
     createdBy:        {type: String, required: true},
-    createdAt:        {type: Date, default: Date.now},
-    notificationTime: {type: Date},
-    readyTime:        {type: Date},
+    createdAt:        {type: Date, required: true, default: Date.now},
+    notificationTime: {type: Date, required: true},
+    readyTime:        {type: Date, required: true},
     attendees: [{
-      user:           {type: String, required: true, unique: true},
-      status:         {type: String, enum: ['pending', 'coming', 'not-coming', 'ready', 'not-ready']}
+      userName:       {type: String, required: true},
+      status:         {type: String, required: true, enum: ['pending', 'coming', 'not-coming', 'ready', 'not-ready']}
     }]
   }]
 });

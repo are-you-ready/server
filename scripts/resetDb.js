@@ -3,30 +3,23 @@ const mongoose = require('mongoose');
 const db = require('../db');
 
 const INIT_STRUCTURE = {
-  users: ['Markus', 'Shannon', 'Ryan', 'Scott', 'TestUser'],
-  groups: {
-    cis55: ['Markus', 'Shannon', 'Ryan', 'Scott']
-    // For now, assume everyone has exactly 1 group
-    // testGroup: ['Markus', 'TestUser']
-  }
+  groups: [{
+    name: 'cis55',
+    users: ['Markus', 'Shannon', 'Ryan', 'Scott']
+  }]
 };
-const {users, groups} = INIT_STRUCTURE;
+const {groups} = INIT_STRUCTURE;
 
 // Clear database
 mongoose.connection.dropDatabase()
   .then(() => console.log('- Dropped database'))
 
-  // Create users
-  .then(() => Promise.all(users.map(db.createUser)))
-  .then(() => console.log(`+ Created ${users.length} users`))
-
   // Create groups
-  .then(() => Promise.all(Object.keys(groups).map(groupName =>
-    db.createGroup(groupName).then(() =>
-      Promise.all(groups[groupName].map(userName =>
-        db.addUserToGroup(groupName, userName)
-      ))
-    )
+  .then(() => Promise.all(groups.map(group =>
+    db.createGroup(group.name)
+      .then(() => Promise.all(group.users.map(userName =>
+        db.updateGroup(group.name, { $push: { users: { name: userName } } })
+      )))
   )))
   .then(() => console.log(`+ Created ${Object.keys(groups).length} groups`))
 

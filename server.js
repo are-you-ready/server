@@ -16,49 +16,103 @@ app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
 
-app.get('/api/user/:name', (req, res) => {
-  const {name} = req.params;
+function cleanGroup(group) {
+  const users = {};
+  group.users.forEach(user => {
+    users[user.name] = {
+      name: user.name,
+      active: user.active
+    };
+  });
 
-  db.getUser(name)
-    .then(user =>
-      db.getGroupsContainingUser(name)
-        .then(groups => ({user, groups}))
-    )
+  return {
+    name: group.name,
+    users: group.users.map(user => users[user.name]),
+    events: group.events.map(event => ({
+      name: event.name,
+      type: event.type,
+      description: event.description,
+      location: event.location,
+      meetupLocation: event.meetupLocation,
+      createdBy: users[event.createdBy],
+      createdAt: event.createdAt,
+      notificationTime: event.notificationTime,
+      readyTime: event.readyTime,
+      attendees: event.attendees.map(attendee => ({
+        user: users[attendee.userName],
+        status: attendee.status
+      }))
+    }))
+  };
+}
 
-    .then(({user, groups}) => {
-      res.json({
-        name: user.name,
-        groups: groups.map(group => ({
-          name: group.name,
-          events: group.events, // TODO
-          users: group.users.map(user => ({name: user.name}))
-        }))
-      });
-    })
-    .catch(err => {
-      res.json({error: err.message});
-    });
+app.get('/api/group/:groupName', (req, res) => {
+  const {groupName} = req.params;
+
+  db.readGroup(groupName)
+    .then(group => res.json(cleanGroup(group)))
+    .catch(err => res.json({
+      errorCode: err.code,
+      errorDescription: err.message
+    }));
 });
 
-app.get('/api/group/:name', (req, res) => {
-  const {name} = req.params;
+app.post('/api/group/:groupName/users', (req, res) => {
+  const {groupName} = req.params;
+  const {userName} = req.body;
 
-  db.getGroup(name)
+  db.updateGroup(groupName, { $push: { users: { name: userName } } })
+    .then(group => res.json(cleanGroup(group)))
+    .catch(err => res.json({
+      errorCode: err.code,
+      errorDescription: err.message
+    }));
+});
 
+app.post('/api/group/:groupName/events', (req, res) => {
+  const {groupName} = req.params;
+  const newEvent = {
+    name: req.body.name,
+    type: req.body.type,
+    description: req.body.description,
+    location: req.body.location,
+    meetupLocation: req.body.meetupLocation,
+    createdBy: req.body.createdBy,
+    notificationTime: req.body.notificationTime,
+    readyTime: req.body.readyTime
+  };
+
+  db.readGroup(groupName)
     .then(group => {
-      res.json({
-        name: group.name,
-        events: group.events, // TODO
-        users: group.users.map(user => ({name: user.name}))
-      });
+      newEvent.attendees = group.users.map(user => ({
+        userName: user.name,
+        status: 'pending'
+      }));
+      return db.updateGroup(groupName, { $push: { events: newEvent } });
     })
-    .catch(err => {
-      res.json({error: err.message});
-    });
+    .then(group => res.json(cleanGroup(group)))
+    .catch(err => res.json({
+      errorCode: err.code,
+      errorDescription: err.message
+    }));
 });
 
-app.post('/api/createEvent', (req, res) => {
-  console.log(req.body);
+app.post('/api/group/:groupName/event/:eventName/status', (req, res) => {
+  const {groupName, eventName} = req.params;
+  const {userName, eventStatus} = req.body;
+
+  db.readGroup(groupName)
+    .then(group => {
+      const eventIndex = group.events.findIndex(event => event.name === eventName);
+      const attendeeIndex = group.events[eventIndex].attendees.findIndex(attendee => attendee.userName === userName);
+      const path = `events.${eventIndex}.attendees.${attendeeIndex}.status`;
+      return db.updateGroup(groupName, { $set: { [path]: eventStatus } });
+    })
+    .then(group => {console.log('FOOSADFOASDFOASDF', group); return res.json(cleanGroup(group))})
+    .catch(err => res.json({
+      errorCode: err.code,
+      errorDescription: err.message
+    }));
 });
 
 app.listen(AYR_PORT, () => {
