@@ -2,12 +2,13 @@
 const mongoose = require('mongoose');
 const db = require('../db');
 
-const INIT_STRUCTURE = {
-  groups: [{
-    name: 'cis55',
+const INIT_STRUCTURE = { groups: [] };
+for (let i = 1; i <= 999; ++i) {
+  INIT_STRUCTURE.groups.push({
+    name: `cis${i}`,
     users: ['Markus', 'Shannon', 'Ryan', 'Scott']
-  }]
-};
+  });
+}
 const {groups} = INIT_STRUCTURE;
 
 // Clear database
