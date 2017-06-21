@@ -108,7 +108,7 @@ app.post('/api/group/:groupName/event/:eventName/status', (req, res) => {
       const path = `events.${eventIndex}.attendees.${attendeeIndex}.status`;
       return db.updateGroup(groupName, { $set: { [path]: eventStatus } });
     })
-    .then(group => {console.log('FOOSADFOASDFOASDF', group); return res.json(cleanGroup(group))})
+    .then(group => res.json(cleanGroup(group)))
     .catch(err => res.json({
       errorCode: err.code,
       errorDescription: err.message

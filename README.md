@@ -2,83 +2,64 @@
 
 Web Server located at http://ayr.pf-n.co
 
-## Installation
+# API
 
-- Make sure you have Node, npm, and Git installed on your machine. (Git is automatically installed when you install XCode)
+## Base URL
 
-```bash
-node --version  # v7.7.3
-npm --version   # 4.1.2
-git --version   # git version 2.11.0 (Apple Git-81)
+The base URL for all requests is
+
+```
+http://ayr.pf-n.co/api
 ```
 
-- Optional: Install Node (and npm) via NVM
+## GET `/group/{groupName}`
 
-```bash
-# Install NVM
-apt-get update
-apt-get install build-essential libssl-dev
-curl -sL https://raw.githubusercontent.com/creationix/nvm/master/install.sh -o nvm.sh
-bash nvm.sh
+Returns the document for the given `groupName`.
 
-# optional append to .bashrc
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+## POST `/group/{groupName}/events`
 
-source ~/.nvm/nvm.sh
+Create a new event for the specified group. Returns the updated group on success.
 
-# optional append to .profile
-source ~/.bashrc
+**JSON Params**
 
-# Install Node
-nvm ls-remote
-nvm install <version>
+Field | Type | Description
+------|------|------------
+name | String | Name of the event
+type | String | Type of the event (eat out, meet up, etc.)
+description | String | A description of the event
+location | String | Where the event is taking place
+meetupLocation | String | Meetup location for the event (car, living room, etc.)
+createdBy | String | (a real API wouldn't need this here, but use this to tell the server who you are)
+notificationTime | Date | When to notify attendees to get ready (e.g. 5 minutes before `readyTime`)
+readyTime | Date | Time of the event
+
+## POST `group/{groupName}/event/{eventName}/status`
+
+Update the status of an attendee for the specified event in the specified group. Returns the updated group on success.
+
+Field | Type | Description
+------|------|------------
+userName | String | (a real API wouldn't need this here, but use this to tell the server who you are)
+eventStatus | String | One of `not-coming`, `coming`, `not-ready`, `ready`
+
+## JSON Error Response
+
+The API may instead return an error as a little JSON object.
+
+**JSON Error Response Example**
+
+```json
+{
+  "errorCode": 10003,
+  "errorDescription": "Group not found"
+}
 ```
 
-- Clone this repository with git to a folder named `/ayr-server`
+**JSON Error Codes**
 
-```bash
-git clone git@github.com:are-you-ready/server.git ayr-server
-```
-
-- Install MongoDB (See [Install MongoDB Community Edition on OS X](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/))
-
-```bash
-curl -O https://fastdl.mongodb.org/osx/mongodb-osx-x86_64-3.4.4.tgz
-tar -zxvf mongodb-osx-x86_64-3.4.4.tgz
-mkdir -p mongodb
-cp -R -n mongodb-osx-x86_64-3.4.4/ mongodb
-
-# ~/.bashrc
-export PATH=<mongodb-install-directory>/bin:$PATH
-```
-
-- Run MongoDB (See [Install MongoDB Community Edition on OS X](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/))
-
-```bash
-mkdir -p /data/db
-#sudo chmod 777 /data/db
-mongod
-```
-
-- Install all dependencies with npm
-
-```bash
-cd ayr-server   # Move to the /ayr-server directory you created
-npm install     # Install dependencies listed in package.json to /node_modules
-```
-
-- Populate the database with some data
-
-```bash
-npm run reset-db
-```
-
-- Run the server locally (on port 3000)
-
-```bash
-npm start       # "Server started on port 3000."
-```
-
-- Test the server by visiting http://localhost:3000
+Code | Meaning
+-----|--------
+10000 | Unknown error
+10001 | Invalid group type
+10002 | Group already exists
+10003 | Group not found
